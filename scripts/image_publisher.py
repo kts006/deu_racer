@@ -6,7 +6,7 @@ from cv_bridge import CvBridge
 import cv2
 import sys
 
-def image_publisher(device_id=0, frame_rate=10, width=640, height=480, brightness=0.5):
+def image_publisher(device_id=0, frame_rate=15, width=640, height=480, brightness=0.5):
    topic_name = "python_image" + str(device_id)
    node_name = 'python_image_publisher' + str(device_id)
    pub = rospy.Publisher(topic_name, Image, queue_size=10)
@@ -20,16 +20,10 @@ def image_publisher(device_id=0, frame_rate=10, width=640, height=480, brightnes
    cap.set(cv2.CAP_PROP_BRIGHTNESS, brightness)
    # cap.set(cv2.CAP_PROP_WHITE_BALANCE, False)
    br = CvBridge()
-   count = 0
    while not rospy.is_shutdown():
       status, img = cap.read()
       if status == True:
          pub.publish(br.cv2_to_imgmsg(img))
-      count = count + 1 
-      if count % 30 == 0 :
-         cap.set(cv2.CAP_PROP_BRIGHTNESS, 0.8) 
-      if count % 60 == 0 :
-         cap.set(cv2.CAP_PROP_BRIGHTNESS, 0.2) 
       rate.sleep()
 
 if __name__ == "__main__":
