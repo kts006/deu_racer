@@ -1,0 +1,16 @@
+<launch>
+  <arg name="device_id" />
+  <arg name="bright"/>
+  <arg name="width" />
+  <arg name="height" />
+  <arg name="camera_frame_id" />
+
+  <node name="$(arg camera_frame_id)" pkg="deu_racer" type="compressed_image_pub2.py" output="screen" >
+    <param name="device_id" value="$(arg device_id)" />
+    <param name="image_width" value="$(arg width)" />
+    <param name="image_height" value="$(arg height)" />
+    <param name="bright" value="$(arg bright)" /> <!-- range: 0.0 ~ 1.0 -->
+    <param name="camera_frame_id" value="$(arg camera_frame_id)" />
+  </node>
+</launch>
+

@@ -1,0 +1,11 @@
+<launch>
+
+    <node name="follower" pkg="deu_racer" type="follower.py" output="screen" />
+    <node name="nav_mode" pkg="deu_racer" type="nav_mode.py" output="screen" />
+    <node name="tur3_nav" pkg="deu_racer" type="tur3_nav.py" output="screen" />
+    <node name="blocking" pkg="deu_racer" type="blocking.py" output="screen" />
+    <node name="light" pkg="deu_racer" type="light.py" output="screen" />
+    <node name="stabilizer" pkg="deu_racer" type="stabilizer.py" output="screen" />
+    <node name="park_sign_match" pkg="deu_racer" type="park_sign_match.py" output="screen" />
+    <node name="maze" pkg="deu_racer" type="maze.py" output="screen" />
+</launch>

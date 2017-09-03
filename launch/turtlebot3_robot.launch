@@ -1,0 +1,22 @@
+<launch>
+
+  <include file="$(find turtlebot3_bringup)/launch/turtlebot3_core.launch"/>
+  <include file="$(find turtlebot3_bringup)/launch/turtlebot3_lidar.launch"/>
+
+  <include file="$(find deu_racer)/launch/compressed_imag_pub.launch">
+    <arg name="device_id" default="0" />
+    <arg name="bright" default="0.2" />
+    <arg name="width" default="320" />
+    <arg name="height" default="240" />
+    <arg name="camera_frame_id" default="line_camera" />
+  </include>
+
+  <include file="$(find deu_racer)/launch/compressed_imag_pub2.launch">
+    <arg name="device_id" default="1" />
+    <arg name="bright" default="0.2" />
+    <arg name="width" default="320" />
+    <arg name="height" default="240" />
+    <arg name="camera_frame_id" default="center_camera" />
+  </include>
+
+</launch>

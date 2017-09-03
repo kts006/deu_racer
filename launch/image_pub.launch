@@ -1,0 +1,15 @@
+<launch>
+  <arg name="device_id" default="0" />
+  <arg name="bright" default="0.5" />
+  <arg name="width" default="640" />
+  <arg name="height" default="480" />
+
+  <node name="image_pub" pkg="deu_autoracer" type="image_publisher.py" output="screen" >
+    <param name="device_id" value="$(arg device_id)" />
+    <param name="image_width" value="$(arg width)" />
+    <param name="image_height" value="$(arg height)" />
+    <param name="bright" value="$(arg bright)" /> <!-- range: 0.0 ~ 1.0 -->
+    <param name="camera_frame_id" value="python_webcam" />
+  </node>
+</launch>
+
