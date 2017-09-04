@@ -36,10 +36,11 @@ class Deu_stabilizer:
     
     def rotate_callback(self, msg):
         self.stabilizer = msg.data
-        if (self.stabilizer and not self.navmode) or not self.tunnel:
-            self.twist.linear.x = 0
-            self.twist.angular.z = -0.5
-            self.cmd_vel_pub.publish(self.twist)
+        if (self.stabilizer and not self.navmode) 
+		if not self.tunnel:
+		    self.twist.linear.x = 0
+		    self.twist.angular.z = -0.5
+		    self.cmd_vel_pub.publish(self.twist)
         
 rospy.init_node('deu_turtlebot3_stabilizer',log_level=rospy.DEBUG)
 stabilizer = Deu_stabilizer()
