@@ -14,7 +14,7 @@ class Camera:
 
         #self.image_sub = rospy.Subscriber('center_camera/image_raw/compressed', CompressedImage, self.image_callback)
         self.image_sub = rospy.Subscriber('/python_image1/compressed', CompressedImage, self.image_callback)
-        self.blocking_pub = rospy.Publisher('tb3/control/block',Bool)
+        self.blocking_pub = rospy.Publisher('tb3/control/block',Bool, queue_size=1)
         
         #self.image_sub = rospy.Subscriber('camera/image_raw/compressed', CompressedImage,  self.image_callback)
         
@@ -83,7 +83,7 @@ class Camera:
 
 
 if __name__ == "__main__":
-    rospy.init_node('camera',log_level=rospy.DEBUG)
+    rospy.init_node('camera',log_level=rospy.INFO)
     
     camera = Camera()
 

@@ -12,7 +12,7 @@ from std_msgs.msg import Bool
 class Deu_stabilizer:
     def __init__(self):
         self.twist = Twist()
-        self.navmode = False
+        self.navmode = True
         self.stabilizer = False
         self.rotate_sub = rospy.Subscriber('tb3/control/stabilize',Bool, self.rotate_callback)
         self.navmode_sub = rospy.Subscriber('tb3/control/navmode',Bool, self.navmode_callback)
@@ -36,7 +36,7 @@ class Deu_stabilizer:
     
     def rotate_callback(self, msg):
         self.stabilizer = msg.data
-        if (self.stabilizer and not self.navmode) 
+        if (self.stabilizer and not self.navmode):
 		if not self.tunnel:
 		    self.twist.linear.x = 0
 		    self.twist.angular.z = -0.5

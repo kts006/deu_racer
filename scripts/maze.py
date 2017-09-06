@@ -7,6 +7,7 @@ import cv2, cv_bridge
 import numpy as np
 import pyturtlebot
 from sensor_msgs.msg import LaserScan
+from std_msgs.msg import Bool
 
 
 class maze_Solver:
@@ -17,7 +18,7 @@ class maze_Solver:
         self.tunnelend_pub = rospy.Publisher('/tb3/conrol/tunnel_end',Bool,queue_size = 1)
         self.tunnel_state = False
         self.move_distance = 0.2
-        self.maze_size = 7
+        self.maze_size = 10
         self.scan_ahead = 10.000
         self.scan_left = 10.000
         self.scan_right = 10.000
@@ -215,8 +216,8 @@ if __name__ == "__main__":
     rospy.init_node('maze',log_level=rospy.DEBUG)
     maze_sol = maze_Solver()
     while True:
-        if self.tunnel_state == True:
-            self.go(self.move_distance)
-            self.solveMaze()
+        if maze_sol.tunnel_state == True:
+            maze_sol.go(self.move_distance)
+            maze_sol.solveMaze()
     rospy.spin()
    

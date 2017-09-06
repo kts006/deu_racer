@@ -10,7 +10,7 @@ class Light:
         self.bridge = cv_bridge.CvBridge()
         self.image_sub = rospy.Subscriber('/python_image1/compressed', CompressedImage, self.image_callback)
 
-        self.light_pub = rospy.Publisher('tb3/control/block', Bool)
+        self.light_pub = rospy.Publisher('tb3/control/block', Bool, queue_size=1)
         self.light = False
 
     def image_callback(self, msg):
@@ -108,7 +108,7 @@ class Light:
         cv2.waitKey(3)
 
 if __name__ == "__main__":
-    rospy.init_node('light',log_level=rospy.DEBUG)
+    rospy.init_node('light',log_level=rospy.INFO)
     light = Light()
     rospy.spin()
  
