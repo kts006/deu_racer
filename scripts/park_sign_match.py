@@ -37,6 +37,7 @@ class Parking:
 
     def white_callback(self,msg):
         self.white_state = msg.data
+        print "self.white_state", self.white_state,"self.parking_state",self.parking_state 
         if self.parking_state and self.white_state :
           self.parking_move()
           self.parking_state = False
@@ -93,13 +94,13 @@ class Parking:
 		        image = cv2.polylines(image, [np.int32(dst)], True, (255, 0, 0), 3, cv2.LINE_AA)
 	        
 		        self.cnt = self.cnt + 1
-		        if self.cnt > 10 :
-		          self.parking_state = True
-	        
+		        if self.cnt > 10 and not self.parking_state:
+		            self.parking_state = True
+	                self.parking_pub.publish(self.parking_state)
 		        rospy.logdebug('주차 표지판 탐지 : %s ' % self.parking_state)
 
 		    else:
-		        self.parking_state = False
+		        #self.parking_state = False
 		        rospy.logdebug("Not enough matches are found - {}/{}".format(len(good), MIN_MATCH_COUNT))
 		        matchesMask = None
 		        
@@ -113,7 +114,7 @@ class Parking:
             if self.cnt > 10 :
                 self.parking_state = True
             
-            self.parking_pub.publish(self.parking_state)
+            
 
             cv2.imshow("park_sign_image", image)
             cv2.waitKey(1)

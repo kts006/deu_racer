@@ -69,13 +69,15 @@ class Move_controller():
         # Announce and publish
         self.__cmd_vel_pub.publish(msg)
 
-    def move_distance(self, distance, velocity=0.22):
+    def move_distance(self, distance, velocity=0.05):
         """Moves a given distance in meters
 
         You can also give it a speed in meters per second to travel at:
 
             robot.move_distance(1, 0.5)  # Should take 2 seconds
         """
+        
+        print "move_distance entered"
         self.__exit_if_movement_disabled()
         # No bounds checking because we trust people. Not like William.
         r = rospy.Rate(1)
@@ -86,7 +88,7 @@ class Move_controller():
         msg.linear.x = velocity
         x0 = self.__x
         y0 = self.__y
-        r = rospy.Rate(100)
+        r = rospy.Rate(30)
         while not rospy.is_shutdown():
             d = ((self.__x - x0)**2 + (self.__y - y0)**2)**0.5
             if d >= distance:
@@ -100,38 +102,53 @@ class Move_controller():
     def turn_tb3(self, angle = -1.57):
         print "trun======================================================"
         tb3_twist = Twist()
-        rate = rospy.Rate(20.0)
-        try:
-            (trans,rot) = self.tf_listener.lookupTransform('/odom','/base_footprint', rospy.Time(0))
-        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-            pass
-        euler = tf.transformations.euler_from_quaternion(rot)
-        init_yaw = euler[2]
-        print "init_yaw :", init_yaw
+        is_fisrt = True
+        init_yaw = 100.0
+        cur_yaw = 100.0
+        
+        acc_yaw = 0.02
+        prev_yaw = cur_yaw
+        
+        rate = rospy.Rate(10.0)
         
         while not rospy.is_shutdown():
             try:
                 (trans,rot) = self.tf_listener.lookupTransform('/odom','/base_footprint', rospy.Time(0))
-            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                pass
+            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as ex:
+                print ex
+                continue
             
             euler = tf.transformations.euler_from_quaternion(rot)
+            if is_fisrt:
+                init_yaw = euler[2]
+                cur_yaw = init_yaw
+                prev_yaw = cur_yaw
+                is_fisrt = False
             cur_yaw = euler[2]
             
-            print "cur_yaw :",cur_yaw
             
-            if init_yaw * cur_yaw >0 :
-                diff_yaw = abs(init_yaw - cur_yaw)
-                
-            elif init_yaw * cur_yaw <0 :
-                diff_yaw = 6.28 - abs(init_yaw) + abs(cur_yaw)
+            diff_yaw = init_yaw - cur_yaw
             
-            if diff_yaw >= angle:
+            if cur_yaw * prev_yaw < 0 and cur_yaw > 0:
+                acc_yaw += abs(cur_yaw + prev_yaw)
+            else:
+                acc_yaw += abs(cur_yaw - prev_yaw)
+            print "cur_yaw", cur_yaw, "prev_yaw", prev_yaw, "acc_yaw", acc_yaw
+
+            if acc_yaw >= abs(angle):
+                print "acc_yaw", acc_yaw
+                twist = Twist()
+                self.__cmd_vel_pub.publish(twist)
                 break
-            tb3_twist.angular.z = -0.1
+                
+                
+            tb3_twist.angular.z = -0.5
             self.__cmd_vel_pub.publish(tb3_twist)
             
+            prev_yaw = cur_yaw  # L
+            
             rate.sleep()
+        print "init_yaw ",init_yaw,"cur_yaw ", cur_yaw ,"diff_yaw",init_yaw - cur_yaw       
                 
     def turn_angle(self, angle, velocity=0.22):
         """Turns the robot a given number of degrees in radians

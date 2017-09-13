@@ -22,8 +22,8 @@ class Deu_turtlebot:
         self.p_state = False
         self.parking_white = False
         
-        self.linear_x = 0.22
-        self.angular_z = 0.0
+        #self.linear_x = 0.22
+        #self.angular_z = 0.0
         
         self.timer = ElapsedTime()
         self.twist = Twist()
@@ -39,12 +39,14 @@ class Deu_turtlebot:
 
     def parking_callback(self, msg):
         self.p_state = msg.data
-        if self.p_state :
-            vel_scale = 0.05
-            print "vel_scale : ", vel_scale
-        else:
-            vel_scale = 0.22
-            print "vel_scale : ", vel_scale
+        if not self.p_state :
+            self.parking_white = False
+        #if self.p_state :
+        #    vel_scale = 0.05
+        #    print "vel_scale : ", vel_scale
+        #else:
+        #   vel_scale = 0.22
+        #    print "vel_scale : ", vel_scale
           
     def navmode_callback(self, msg):
         self.nav_state = msg.data
@@ -64,9 +66,8 @@ class Deu_turtlebot:
             if not self.parking_white :
                 rospy.logdebug('Pose(%d,%d)',self.xpose, self.ypose)
                 err = self.xpose - 320/2
-                #self.twist.linear.x = vel_scale
                 self.twist.linear.x = vel_scale
-                self.twist.angular.z = -float(err)/10 # / 40
+                self.twist.angular.z = -float(err)/20 # / 40
                 self.cmd_vel_pub.publish(self.twist)
 
 rospy.init_node('deu_turtlebot3_nav',log_level=rospy.INFO)
@@ -74,6 +75,5 @@ deutur = Deu_turtlebot()
 rate = rospy.Rate(20)
 while not rospy.is_shutdown():
     deutur.navigate()
-    #rospy.spinonce()
     rate.sleep()
     

@@ -4,7 +4,6 @@
 import rospy, cv2, cv_bridge
 import numpy as np
 import matplotlib.pyplot as plt
-import time
 
 from distance_calculator import DistanceCalculator
 from sensor_msgs.msg import CompressedImage, Image
@@ -32,8 +31,6 @@ class Tunnel_mark:
     # 이미지 처리 후 표지판을 찾으면 /tb3/control/tunnel을 Publish
     def image_callback(self, msg):
 	self.count = self.count + 1
-	print self.count
-	start = time.time()
 	image = self.bridge.compressed_imgmsg_to_cv2(msg, desired_encoding='8UC3')
 	imageGray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -81,8 +78,8 @@ class Tunnel_mark:
 	    
 		    self.cnt = self.cnt + 1
 		    if self.cnt > 10 :
-		      self.tunnel_state = True
-
+                self.tunnel_state = True
+                self.tunnel_pub.publish(self.tunnel_state)
 		    rospy.logdebug('터널 표지판 탐지 : %s ' % self.tunnel_state)
 
 		else:
@@ -97,11 +94,10 @@ class Tunnel_mark:
 		    for pt in outer_dst_pts:
 		        x,y = pt[0]
 		        cv2.circle(image, (x, y),3, (0,0,255), -1)
-		if self.cnt > 10 :
-		  self.tunnel_state = True
-		self.tunnel_pub.publish(self.tunnel_state)
-		end = time.time()
-		print end-start
+        if self.cnt > 10:
+            self.tunnel_state = True
+        #self.tunnel_pub.publish(self.tunnel_state)
+
 	
 	cv2.imshow("tunnel_sign_image", image)
 	cv2.waitKey(1)

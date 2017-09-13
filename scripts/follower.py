@@ -64,9 +64,7 @@ class Follower:
         M_left = cv2.moments(mask_left)
         M_right = cv2.moments(mask_right)
         
-        if self.parking and self.parking_topic_count == 0:
-          self.parking_topic_count = 1
-          
+        if self.parking :
           indices = np.where(mask_right > 0)
           indices_len = len(indices[0])
           rospy.logdebug('pixel count : %d',indices_len)
@@ -80,7 +78,7 @@ class Follower:
         if M_left['m00'] > 0 and M_right['m00'] <= 0 and not self.stabilizer:
             cx_left = int(M_left['m10']/M_left['m00'])
             cy_left = int(M_left['m01']/M_left['m00'])
-            cx = cx_left + 100
+            cx = cx_left + 120
             cy = cy_left
             self.pose_msg.xpose = cx
             self.pose_msg.ypose = cy
@@ -91,7 +89,7 @@ class Follower:
         elif M_left['m00'] <= 0 and M_right['m00'] > 0 and not self.stabilizer :
             cx_right = int(M_right['m10']/M_right['m00'])
             cy_right = int(M_right['m01']/M_right['m00'])
-            cx = cx_right - 100
+            cx = cx_right - 120
             cy = cy_right
             self.pose_msg.xpose = cx
             self.pose_msg.ypose = cy

@@ -64,6 +64,7 @@ class Nav_Mode :
                     self.target_angular_vel  = 0
                     self.control_angular_vel = 0
                     rospy.loginfo('RUN MODE')
+                    #self.mode_pub.publish(self.nav_status)
                 
                 # Pause Mode    
                 elif key == 'p' :
@@ -108,10 +109,10 @@ class Nav_Mode :
                         self.control_angular_vel = self.target_angular_vel
 
                 
-                self.twist.linear.x = self.control_linear_vel; self.twist.linear.y = 0; self.twist.linear.z = 0
-                self.twist.angular.x = 0; self.twist.angular.y = 0; self.twist.angular.z = self.control_angular_vel
-                self.twist_pub.publish(self.twist)
-                
+                    self.twist.linear.x = self.control_linear_vel; self.twist.linear.y = 0; self.twist.linear.z = 0
+                    self.twist.angular.x = 0; self.twist.angular.y = 0; self.twist.angular.z = self.control_angular_vel
+                    self.twist_pub.publish(self.twist)
+                    
                 self.mode_pub.publish(self.nav_status)
 
         finally:
