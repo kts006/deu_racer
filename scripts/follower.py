@@ -21,6 +21,8 @@ class Follower:
         self.parkline_pub = rospy.Publisher('/tb3/control/parking_white',Bool,queue_size = 1)
         #self.image_sub = rospy.Subscriber('/python_image0',Image, self.image_callback)
         self.area = 7
+        self.parking_topic_count = 0
+        self.cnt = 0
         self.parking = False
         self.stabilizer = True
         if rospy.has_param('~area'):
@@ -29,6 +31,7 @@ class Follower:
                 pass
             else:
                 self.area = rospy.get_param('~area')
+
     def parking_callback(self, msg):
         self.parking = msg.data
 
@@ -37,10 +40,10 @@ class Follower:
         #image = self.bridge.imgmsg_to_cv2(msg,desired_encoding='8UC3')
 
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        lower_yellow_line = np.array([ 15, 105, 110])
-        upper_yellow_line = np.array([ 54, 255, 255])
-        lower_white_line = np.array([ 0,  0,  190])
-        upper_white_line = np.array([255, 40, 255])
+        lower_yellow_line = np.array([ 24, 0, 220])
+        upper_yellow_line = np.array([ 38, 150, 255])
+        lower_white_line = np.array([ 47,  0,  207])
+        upper_white_line = np.array([157, 47, 255])
         mask_left = cv2.inRange(hsv, lower_yellow_line, upper_yellow_line)
         mask_right = cv2.inRange(hsv, lower_white_line, upper_white_line)
         
@@ -61,14 +64,17 @@ class Follower:
         M_left = cv2.moments(mask_left)
         M_right = cv2.moments(mask_right)
         
-        if self.parking: 
-            indices = np.where(mask_right > 0)
-            indices_len = len(indices[0])
-            rospy.logdebug('pixel count : %d',indices_len)
-            
-            if indices_len > 200:
-                self.parkline_pub.publish(True)
-                rospy.logdebug('pub_True')
+        if self.parking and self.parking_topic_count == 0:
+          self.parking_topic_count = 1
+          
+          indices = np.where(mask_right > 0)
+          indices_len = len(indices[0])
+          rospy.logdebug('pixel count : %d',indices_len)
+          
+          if indices_len < 1:
+            print "======================================================================="
+            self.parkline_pub.publish(True)
+            rospy.logdebug('pub_True')
         
         
         if M_left['m00'] > 0 and M_right['m00'] <= 0 and not self.stabilizer:
@@ -124,3 +130,4 @@ rospy.init_node('follower',log_level=rospy.INFO)
 follower = Follower()
 rospy.spin()
 # END ALL
+

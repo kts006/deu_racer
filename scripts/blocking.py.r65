@@ -61,12 +61,11 @@ class Camera:
         image = cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 255), 2)
 
         # 픽셀 수 (20cm: 10200~10400, 25cm: 6300~6500, 30cm: 4200~4500, 35cm: 2900~3100, 40cm: 2300~2500) 
-        print 'w*h= ', w*h, 'size= ', size, 'h= ',h
+       
+        print 'w*h= ', w*h, 'size= ', size, 'h= ', h
 
-
-        if (w*h) - 500 <= size and size < 6000 and 25 < h:
-
-            if 2000 < max_indices_len:
+        if (w*h) - 200 <= size and size < 76800 and 25 < h:
+            if 1000 < max_indices_len:
                 self.blocking = True
                 
                 rospy.loginfo('차단바 탐지')     

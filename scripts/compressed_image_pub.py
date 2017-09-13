@@ -7,7 +7,7 @@ import cv2
 import sys
 import numpy as np
 
-def image_publisher(device_id=0, frame_rate=20, width=320, height=240, brightness=0.5):
+def image_publisher(device_id=0, frame_rate=10, width=320, height=240, brightness=0.5):
    topic_name = "python_image" + str(device_id)
    node_name = 'python_image_publisher' + str(device_id)
    pub1 = rospy.Publisher(topic_name, Image, queue_size=10)

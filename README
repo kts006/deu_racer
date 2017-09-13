@@ -1,0 +1,6 @@
+이 패키지는 터틀봇3 오토레이스 대회용 패키지입니다.
+video_stream_opencv 패키지 이용
+
+turtlebot3_setup - launch/turtlebot3_robot.launch
+turtlebot3_lane_detect - scripts/follower_left.py, scripts/follower_right.py
+turtlebot3_navigation - scripts/tur3_nav.py

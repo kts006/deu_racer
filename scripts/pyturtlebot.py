@@ -6,6 +6,8 @@ import sys
 import time
 import numpy as np
 import random
+import tf
+
 
 from math import radians
 
@@ -30,6 +32,8 @@ class Move_controller():
         self.__angle = None
         self.__cumulative_angle = 0.0
         self.__have_odom = False
+        
+        self.tf_listener = tf.TransformListener()
         
         #라이더가 장애물을 발견하고 발견한 횟수가 5번을 넘어가면 확실히 장애물을 인식한 것으로 취급
         self.__ridar_cnt = 0
@@ -92,7 +96,43 @@ class Move_controller():
             r.sleep()
         msg.linear.x = 0.0
         self.__cmd_vel_pub.publish(msg)
-
+        
+    def turn_tb3(self, angle = -1.57):
+        print "trun======================================================"
+        tb3_twist = Twist()
+        rate = rospy.Rate(20.0)
+        try:
+            (trans,rot) = self.tf_listener.lookupTransform('/odom','/base_footprint', rospy.Time(0))
+        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+            pass
+        euler = tf.transformations.euler_from_quaternion(rot)
+        init_yaw = euler[2]
+        print "init_yaw :", init_yaw
+        
+        while not rospy.is_shutdown():
+            try:
+                (trans,rot) = self.tf_listener.lookupTransform('/odom','/base_footprint', rospy.Time(0))
+            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+                pass
+            
+            euler = tf.transformations.euler_from_quaternion(rot)
+            cur_yaw = euler[2]
+            
+            print "cur_yaw :",cur_yaw
+            
+            if init_yaw * cur_yaw >0 :
+                diff_yaw = abs(init_yaw - cur_yaw)
+                
+            elif init_yaw * cur_yaw <0 :
+                diff_yaw = 6.28 - abs(init_yaw) + abs(cur_yaw)
+            
+            if diff_yaw >= angle:
+                break
+            tb3_twist.angular.z = -0.1
+            self.__cmd_vel_pub.publish(tb3_twist)
+            
+            rate.sleep()
+                
     def turn_angle(self, angle, velocity=0.22):
         """Turns the robot a given number of degrees in radians
 
@@ -179,7 +219,7 @@ class Move_controller():
             
           if self.__ridar_cnt > 5:
             self.chk_obstacle = True
-          print self.chk_obstacle
+          #print self.chk_obstacle
           
     #움직임이 제어가 되지 않을 때 발생
     def __exit_if_movement_disabled(self):
@@ -202,19 +242,22 @@ class Move_controller():
     
     #장애물이 없을 때 주차행동
     def move_command(self):
-        self.turn_angle(radians(-75),radians(-75))#90
+        self.turn_tb3(-1.57)
+        #self.turn_angle(radians(-75),radians(-75))#90
         self.wait(0.6)
 
         self.move_distance(0.25)#forward aa
         self.wait(2.0)#wait for stay(2s waiting)
 
-        self.turn_angle(radians(150), radians(150))#180
+        self.turn_tb3(-3.1415)
+        #self.turn_angle(radians(150), radians(150))#180
         self.wait(0.6)#not to slip
 
         self.move_distance(0.25)#forward aa
         self.wait(0.6)
-
-        self.turn_angle(radians(-75), radians(-75))
+        
+        self.turn_tb3(-1.57)
+        #self.turn_angle(radians(-75), radians(-75))
         self.wait(0.6)
 
     # 장애물을 만났을 때 해야 할 행동

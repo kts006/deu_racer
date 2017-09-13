@@ -10,7 +10,7 @@ from std_msgs.msg import Bool
 from elapsed_time import ElapsedTime
 import sys
 #import pyturtlebot as Robot
-vel_scale = 0.15
+vel_scale = 0.22
 
 class Deu_turtlebot:
     def __init__(self):
@@ -22,6 +22,9 @@ class Deu_turtlebot:
         self.p_state = False
         self.parking_white = False
         
+        self.linear_x = 0.22
+        self.angular_z = 0.0
+        
         self.timer = ElapsedTime()
         self.twist = Twist()
         self.control_sub = rospy.Subscriber('tb3/control/block',Bool, self.control_callback)
@@ -31,17 +34,17 @@ class Deu_turtlebot:
         self.pose_sub = rospy.Subscriber('/line_pose',Deu_pose, self.pose_callback)
         self.cmd_vel_pub = rospy.Publisher('/cmd_vel',Twist,queue_size = 1)
 
-
     def parking_white_callback(self, msg):
         self.parking_white = msg.data
-        
 
     def parking_callback(self, msg):
         self.p_state = msg.data
         if self.p_state :
-            vel_scale = 0.1
+            vel_scale = 0.05
+            print "vel_scale : ", vel_scale
         else:
             vel_scale = 0.22
+            print "vel_scale : ", vel_scale
           
     def navmode_callback(self, msg):
         self.nav_state = msg.data
@@ -53,19 +56,24 @@ class Deu_turtlebot:
 #        rospy.logdebug('%d %d nav %s  con %s',msg.xpose, msg.ypose,self.nav_state,self.control_state)
         self.xpose = msg.xpose
         self.ypose = msg.ypose
-        self.navigation()
+        #self.navigate()
 
-    def navigation(self):
+    def navigate(self):
         if not self.nav_state :
           if not self.control_state :
             if not self.parking_white :
                 rospy.logdebug('Pose(%d,%d)',self.xpose, self.ypose)
                 err = self.xpose - 320/2
+                #self.twist.linear.x = vel_scale
                 self.twist.linear.x = vel_scale
-                self.twist.angular.z = -float(err) / 30
+                self.twist.angular.z = -float(err)/10 # / 40
                 self.cmd_vel_pub.publish(self.twist)
 
 rospy.init_node('deu_turtlebot3_nav',log_level=rospy.INFO)
 deutur = Deu_turtlebot()
-rospy.spin()
-
+rate = rospy.Rate(20)
+while not rospy.is_shutdown():
+    deutur.navigate()
+    #rospy.spinonce()
+    rate.sleep()
+    

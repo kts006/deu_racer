@@ -1,15 +1,16 @@
 <launch>
   <arg name="device_id" default="0" />
   <arg name="bright" default="0.5" />
-  <arg name="width" default="640" />
-  <arg name="height" default="480" />
+  <arg name="width" default="320" />
+  <arg name="height" default="240" />
+  <arg name="frame_rate" default="10" />
 
-  <node name="image_pub" pkg="deu_autoracer" type="image_publisher.py" output="screen" >
+  <node name="deu_racer_image_pub" pkg="deu_autoracer" type="deu_image_pub_node" output="screen" >
     <param name="device_id" value="$(arg device_id)" />
     <param name="image_width" value="$(arg width)" />
     <param name="image_height" value="$(arg height)" />
     <param name="bright" value="$(arg bright)" /> <!-- range: 0.0 ~ 1.0 -->
-    <param name="camera_frame_id" value="python_webcam" />
+    <param name="frame_rate" value="$(arg frame_rate)" />
+    <param name="camera_frame_id" value="deu_racer_camera" />
   </node>
 </launch>
-
