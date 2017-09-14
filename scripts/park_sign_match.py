@@ -18,6 +18,7 @@ class Parking:
     def __init__(self):
     	self.count = 0
         self.cnt = 0
+        self.had_been_park = 0
         self.bridge = cv_bridge.CvBridge()
         self.dist_calc = DistanceCalculator('parking')
         self.parking_state = False
@@ -39,10 +40,13 @@ class Parking:
         self.white_state = msg.data
         print "self.white_state", self.white_state,"self.parking_state",self.parking_state 
         if self.parking_state and self.white_state :
-          self.parking_move()
-          self.parking_state = False
-          self.parking_pub.publish(self.parking_state)
-          self.cnt = 0
+          if self.had_been_park < 1 : 
+            self.parking_move()
+            self.parking_state = False
+            self.parking_pub.publish(self.parking_state)
+            self.cnt = 0
+            self.had_been_park = 1
+       
 
     # 이미지 처리 후 표지판을 찾으면 /tb3/control/parking를 Publish
     def image_callback(self, msg):
@@ -124,3 +128,4 @@ if __name__ == '__main__':
     rospy.init_node('sign',log_level=rospy.DEBUG)
     p = Parking()
     rospy.spin()
+
